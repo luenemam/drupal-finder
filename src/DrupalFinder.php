@@ -29,24 +29,16 @@ class DrupalFinder {
 
     foreach (array(TRUE, FALSE) as $follow_symlinks) {
       $path = $start_path;
-      if ($follow_symlinks && is_link($path)) {
-        $path = realpath($path);
-      }
-      // Check the start path.
-      if ($checked_path = $this->isValidRoot($path)) {
-        return $checked_path;
-      }
-      else {
-        // Move up dir by dir and check each.
-        while ($path = $this->shiftPathUp($path)) {
-          if ($follow_symlinks && is_link($path)) {
-            $path = realpath($path);
-          }
-          if ($checked_path = $this->isValidRoot($path)) {
-            return $checked_path;
-          }
+      do {
+        if ($follow_symlinks && is_link($path)) {
+          $path = realpath($path);
+        }
+        // Check the start path.
+        if ($this->isValidRoot($path)) {
+          return TRUE;
         }
       }
+      while (($path = dirname($path)) && ($path != '.'));
     }
 
     return FALSE;
